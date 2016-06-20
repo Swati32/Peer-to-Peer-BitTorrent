@@ -1,0 +1,63 @@
+package peer1;
+
+import java.net.*;
+import java.io.*;
+import java.nio.*;
+import java.nio.channels.*;
+import java.util.*;
+public class ReadFile {
+	public static void main(String [] args) {
+
+        // The name of the file to open.
+        String fileName = "C:/Users/hp/workspace/peer/bin/Server/config.txt";
+
+        // This will reference one line at a time
+        String line = null;
+
+        try {
+            // FileReader reads text files in the default encoding.
+            FileReader fileReader = 
+                new FileReader(fileName);
+
+            // Always wrap FileReader in BufferedReader.
+            BufferedReader bufferedReader = 
+                new BufferedReader(fileReader);
+            int i = 0;
+            String [][] abc = new String [3][4];
+            while((line = bufferedReader.readLine()) != null) {
+            	//System.out.println(line);
+            	String [] elems = line.split("\\s+");
+            	//abc [i] = line.split("\\s+"
+            	//System.out.println(elems.length);
+            	for(int j = 0; j<elems.length; j++){
+            		//System.out.println(j);
+            		//System.out.println(elems[j]);
+            		abc[i][j]= elems[j];
+            	}
+            	//System.out.println(elems [i]);
+            	i++;
+                //System.out.println(line);
+            }   
+            for(int j = 0; j<abc.length; j++)
+        	{
+             for(int k=0;k<=3;k++){	 
+                System.out.println(abc[j][k]); 
+             }
+        	}
+            // Always close files.
+            bufferedReader.close();         
+        }
+        catch(FileNotFoundException ex) {
+            System.out.println(
+                "Unable to open file '" + 
+                fileName + "'");                
+        }
+        catch(IOException ex) {
+            System.out.println(
+                "Error reading file '" 
+                + fileName + "'");                  
+            // Or we could just do this: 
+            // ex.printStackTrace();
+        }
+    }
+}

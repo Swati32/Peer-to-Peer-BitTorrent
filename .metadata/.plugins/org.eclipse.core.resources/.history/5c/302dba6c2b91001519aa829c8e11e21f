@@ -1,0 +1,195 @@
+package peer1;
+
+import java.net.*;
+import java.io.*;
+import java.nio.*;
+import java.nio.channels.*;
+import java.util.*;
+
+public class Server1 {
+	int sPort = 8001;    //The server will be listening on this port number
+	ServerSocket sSocket;   //serversocket used to listen on port number 8000
+	Socket connection = null; //socket for the connection with the client
+	String message;    //message received from the client
+	String MESSAGE;    //uppercase message send to the client
+	ObjectOutputStream out;  //stream write to the socket
+	ObjectInputStream in;    //stream read from the socket
+	public final static int SOCKET_PORT = 8010;  // you may change this
+	public final static String FILE_TO_SEND = "C:\\Users\\Swati\\workspace4\\peer";
+   
+	  
+	  
+	  
+  public void Server() {}
+
+	void run()
+	{
+		try{
+			//create a serversocket
+			sSocket = new ServerSocket(sPort, 10); 	
+			//Wait for connection
+			System.out.println("Waiting for connection");
+			//accept a connection from the client
+			connection = sSocket.accept();
+			System.out.println("Connection received from " + connection.getInetAddress().getHostName());
+			//initialize Input and Output streams
+			out = new ObjectOutputStream(connection.getOutputStream());
+			out.flush();
+			in = new ObjectInputStream(connection.getInputStream());
+			try{
+				while(true)
+				{
+					//receive the message sent from the client
+					message = (String)in.readObject();
+					//show the message to the user
+					System.out.println("Receive message: " + message);
+					//Capitalize all letters in the message
+					MESSAGE = message.toUpperCase();
+					//send MESSAGE back to the client
+					sendMessage(MESSAGE);
+				}
+			}
+			catch(ClassNotFoundException classnot){
+					System.err.println("Data received in unknown format");
+				}
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}
+		finally{
+			//Close connections
+			try{
+				in.close();
+				out.close();
+				sSocket.close();
+			}
+			catch(IOException ioException){
+				ioException.printStackTrace();
+			}
+		}
+	}
+	//send a message to the output stream=
+	void sendMessage(String msg)
+	{
+		try{
+			out.writeObject(msg);
+			out.flush();
+			System.out.println("Send message: " + msg);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}
+	}
+
+ 	public static void main(String args[]) throws IOException {
+
+ 		boolean listening = true;
+ 		FileSplit1 f= new FileSplit1();
+ 	    f.splitFile(new File(FILE_TO_SEND+"\\CN.pdf")); 
+        Server1 s = new Server1();
+//        s.run();  
+        FileInputStream fis = null;
+	    BufferedInputStream bis = null;
+	    OutputStream os = null;
+	    ServerSocket servsock = null;
+	    Socket sock = null;
+	    try {
+	      servsock = new ServerSocket(SOCKET_PORT ,10);
+	      System.out.println("Waiting...");
+	      sock = servsock.accept();
+	      System.out.println("Accepted connection : " + sock);
+	      while (listening){
+	          new MultiServerThread(servsock.accept()).start();
+
+	      }
+	        
+	      
+	    } 
+	    
+	    finally {
+	      if (servsock != null) servsock.close();
+	    }
+	  }
+}
+
+class FileSplit1 {
+    public static void splitFile(File f) throws IOException {
+        int partCounter = 1;//I like to name parts from 001, 002, 003, ...
+                            //you can change it to 0 if you want 000, 001, ...
+
+        int sizeOfFiles = 1024 * 100;// 100KB
+        byte[] buffer = new byte[sizeOfFiles];
+
+        try (BufferedInputStream bis = new BufferedInputStream(
+                new FileInputStream(f))) {//try-with-resources to ensure closing stream
+            String name = f.getName();
+            Long size =f.length();
+            System.out.println("File Name : "+ name) ;
+            System.out.println("File Size : "+ size) ;
+            int tmp = 0;
+            while ((tmp = bis.read(buffer)) > 0) {
+                //write each chunk of data into separate file with different number in name
+                File newFile = new File(Integer.toString((partCounter++)));
+                try (FileOutputStream out = new FileOutputStream(newFile)) {
+                    out.write(buffer, 0, tmp);//tmp is chunk size
+                   
+                }
+               
+            }
+            System.out.println("Number of Chunks : "+ (partCounter-1)) ;  
+        }
+    }
+}
+
+
+
+class MultiServerThread extends Thread {
+private Socket socket = null;
+public MultiServerThread(Socket socket) {
+super("MultiServerThread");
+this.socket = socket;
+}
+
+public void run() {
+	   FileInputStream fis = null;
+	    BufferedInputStream bis = null;
+	    OutputStream os = null;
+	    ServerSocket servsock = null;
+	    Socket sock = null;
+	  try {
+			String FILE = "C:\\Users\\Swati\\workspace4\\peer";
+             
+          // send file
+          String filename = FILE + "\\1" ;	
+          File myFile = new File (filename);
+          System.out.println("Accepted connection : " + myFile.length());
+          byte [] mybytearray  = new byte [(int)myFile.length()];
+          System.out.println("Accepted connection : " + mybytearray.length);
+          fis = new FileInputStream(myFile);
+          bis = new BufferedInputStream(fis);
+          System.out.println("Accepted connection : " + fis);
+          bis.read(mybytearray,0,mybytearray.length);
+          os = sock.getOutputStream();
+          System.out.println("Sending " + FILE + "(" + mybytearray.length + " bytes)");
+          os.write(mybytearray,0,mybytearray.length);
+          os.flush();
+          System.out.println("Done.");
+        }
+	  catch ( FileNotFoundException e ) {
+  		System.err.println("File not found");
+	   }
+	  catch(IOException ioException){
+			ioException.printStackTrace();
+		}
+        finally {
+        try{	
+          if (bis != null) bis.close();
+          if (os != null) os.close();
+          if (sock!=null) sock.close();
+        }
+	    catch(IOException ioException){
+			ioException.printStackTrace();
+		}
+        }
+}
+}

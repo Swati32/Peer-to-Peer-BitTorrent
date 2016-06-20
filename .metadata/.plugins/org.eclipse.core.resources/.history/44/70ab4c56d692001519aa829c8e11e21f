@@ -1,0 +1,26 @@
+package peer1;
+
+import java.net.*;
+import java.io.*;
+import java.nio.*;
+import java.nio.channels.*;
+import java.util.*;
+public class NewFile {
+	
+	    public static void main(String[] args) {
+	        
+	        try {
+	        	File file = new File("C:/Users/hp/workspace/peer/bin/Server/config.txt");
+				FileWriter fileWriter = new FileWriter(file);
+				PrintWriter printWriter = new PrintWriter(fileWriter);
+				printWriter.println("C PN Neigh1 Neigh2  ");
+			    
+				printWriter.write("1 8001 2 3 ");
+				fileWriter.flush();
+				fileWriter.close();
+	        } catch ( IOException e ) {
+	            e.printStackTrace();
+	        } 
+	    }
+	
+}

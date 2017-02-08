@@ -1,11 +1,14 @@
 
-
+//imports
 import java.net.*;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
+
+
 class FileSplit {
+    //Splits a file into chunks and returns the chunk numbers in Arraylist	
     public ArrayList splitFile(File f) throws IOException {
         int partCounter = 1;
         int sizeOfFiles = 1024 * 100;// 100KB
@@ -28,6 +31,4 @@ class FileSplit {
         }
 		return ChunkList;
     }
-
-   
 }

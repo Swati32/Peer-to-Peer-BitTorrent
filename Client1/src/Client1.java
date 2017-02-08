@@ -25,17 +25,17 @@ import java.util.concurrent.TimeUnit;
 
 public class Client1 {
 	int MY_ID = 1;
+	
 	ServerSocket sSocket;
 	Socket connection = null;
 	ObjectOutputStream out;
 	DataInputStream in;
-	public final static int MY_PORT = 8001;
 
+	public final static int MY_PORT = 8001;
 	public final static int SERVER_PORT = 8000;
 
 	public static List CHUNKLIST = new ArrayList();
 	public static int TOTALCHUNKS;
-	public final static String FILE_TO_SEND = "";
 	public final static String SERVER = "127.0.0.1";
 	public final static String FILE_TO_RECEIVE = "";
 	public final static int FILE_SIZE = 1024 * 100;
@@ -44,9 +44,6 @@ public class Client1 {
 	public static int NP1 = 0;
 	public static int NP2 = 0;
 	Socket requestSocket;
-
-	public void Client() {
-	}
 
 	FileInputStream fis = null;
 	BufferedInputStream bis = null;
@@ -67,8 +64,6 @@ public class Client1 {
 			try {
 				sock = new Socket("localhost", SERVER_PORT);
 				System.out.println("CONNECTED TO SERVER ");
-				System.out.println(); 
-				
 				try {
 					// create write stream to send information
 					out = new DataOutputStream(sock.getOutputStream());
@@ -81,15 +76,10 @@ public class Client1 {
 					for (int i = 0; i < 2; i++) {
 						for (int j = 0; j < 2; j++) {
 							try {
-								// create write stream to send information
-								
 								in = new DataInputStream(sock.getInputStream());
-
 								neigh[i][j] = in.readInt();
-								
-
 							} catch (IOException e) {
-
+								System.out.println("Error Reading Neighbors from Server ");
 							}
 							NP1 = neigh[0][1];
 							NP2 = neigh[1][1];
@@ -97,10 +87,8 @@ public class Client1 {
 						}
 						
 					}
-					System.out.println("Got my neighbor 1 "+ neigh[0][0]+" "+neigh[0][1]);
-					System.out.println("Got my neighbor 2 "+ neigh[1][0]+" "+neigh[1][1]);
-				} catch (IOException e) {
-					
+				  } catch (IOException e) {
+					System.out.println("Error Reading Neighbors from Server ");
 				}
 
 			} catch (IOException e) {
@@ -207,7 +195,7 @@ public class Client1 {
 				DataInputStream in;
 				in = new DataInputStream(socket.getInputStream());
 				String temp = in.readUTF();
-				//System.out.println("I got download request I think " + temp);
+
 				if (temp.equals("Updated Neighbors")) {
 					in = new DataInputStream(socket.getInputStream());
 					int temp1 = in.readInt();
@@ -221,9 +209,7 @@ public class Client1 {
 					NP2 = temp3;
 					int np1 = temp2;
 					int np2 = temp4;
-					System.out.println("new neighbors are: "+"Neighbor 1: "+np1);
-					System.out.println("new neighbors are: "+"Neighbor 2: "+np2);
-				}				else {
+				} else {
 					System.out.println();
 					System.out.println("Got download request from neighbor");	
 					
@@ -238,13 +224,8 @@ public class Client1 {
                    
 					try {
 
-						// send file
-
 						in = new DataInputStream(socket.getInputStream());
 						num = in.readInt();
-						//System.out.println("UUU AFTER 1 "+ CHUNKLIST.size());
-						//System.out.println("UUU AFTER 1 "+ tempchunklist.size());
-						//System.out.println("UUU AFTER 1 "+ newtemplist.size());
 						System.out.println();
 						System.out.println("Receiving chunk list from neighbor ");
 						
@@ -388,59 +369,39 @@ public class Client1 {
 	} // upload end
 
 	public class download implements Runnable {
-
-
 		@Override
 		public void run() {
-
 			int NPORT = NP1;
-			System.out.println();
-			for (int i = 0; i < CHUNKLIST.size(); i++) {
-				if(i==0){System.out.print("Sending my chunk list to neighbor [");}
-				System.out.print(" "+ CHUNKLIST.get(i));
-				if(i==CHUNKLIST.size()-1){System.out.print("]\n");}
-			}
+
 			
+			System.out.print("Sending my chunk list to neighbor");
 			for (int i = 0; CHUNKLIST.size() < TOTALCHUNKS; i++) {
-			
 				if(i%2==0){
 					NPORT = NP2;
 				}
-				
 				try {
 					Thread.sleep(2000);
 				} catch (InterruptedException e1) {
-					
 					e1.printStackTrace();
 				}
 				
 				
-				
-				
 				int num = 0;
 				try {
-
 					sock = new Socket("localhost", NPORT);
-			
-					DataOutputStream out;
-					out = new DataOutputStream(sock.getOutputStream());
+					DataOutputStream out = new DataOutputStream(sock.getOutputStream());
 					out.writeUTF("DOWNLOAD CHUNKS");
 					
 					out = new DataOutputStream(sock.getOutputStream());
 					out.writeInt(CHUNKLIST.size());
 					List receivedList = new ArrayList();
-					
-	            
-	 
 
 					for (int n = 0; n < CHUNKLIST.size(); n++) {
 						try {
-
 							out = new DataOutputStream(sock.getOutputStream());
 							String s = CHUNKLIST.get(n).toString();
 							int si = Integer.parseInt(s);
 							out.writeInt(si);
-					
 						} catch (IOException e) {
 							System.err.println("Io exception found in Download ");
 						}
@@ -468,10 +429,12 @@ public class Client1 {
 						index = 0;
 					}
 					for (int k = 0; k < num; k++) {
+						
 						byte[] myarray = new byte[FILE_SIZE];
 						InputStream is = sock.getInputStream();
 						String temp = receivedList.get(k).toString();
 						CHUNKLIST.add(index, Integer.parseInt(temp));
+						
 						fos = new FileOutputStream((String) receivedList.get(k));
 						bos = new BufferedOutputStream(fos);
 						bytesRead = is.read(myarray, 0, myarray.length);
@@ -486,8 +449,7 @@ public class Client1 {
 
 						bos.write(myarray, 0, current);
 						bos.flush();
-					System.out.println("D Chunk " + receivedList.get(k)
-								+ " downloaded (" + current + " bytes)");
+					    System.out.println("D Chunk " + receivedList.get(k) + " downloaded (" + current + " bytes)");
 					}
 						
 					} catch (FileNotFoundException e) {
@@ -510,17 +472,10 @@ public class Client1 {
 						ioException.printStackTrace();
 					}
 				}
-
 			}
 			System.out.println("All chunks received successfully.  " );
 			MergeFile m = new MergeFile();
 			m.merge(TOTALCHUNKS);
-			
-
 		}
-
-
 	}
-
-	
 }

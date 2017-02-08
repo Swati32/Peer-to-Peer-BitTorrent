@@ -19,66 +19,44 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+
 public class MergeFile {
 	private static String FILE_NAME = "Final.pdf";
 
-    public void merge(int num) {
-        int size = num;
-        File ofile = new File(FILE_NAME);
+	public void merge(int num) {
+		int size = num;
+		File ofile = new File(FILE_NAME);
+		FileOutputStream fos;
+		FileInputStream fis;
+		byte[] fileBytes;
+		int bytesRead = 0;
 
-        FileOutputStream fos;
+		List<File> list = new ArrayList<File>();
 
-        FileInputStream fis;
+		for (int i = 1; i <= size; i++) {
+			list.add(new File(Integer.toString(i)));
+		}
 
-        byte[] fileBytes;
+		try {
+			fos = new FileOutputStream(ofile, true);
+			for (File file : list) {
+				fis = new FileInputStream(file);
+				fileBytes = new byte[(int) file.length()];
+				bytesRead = fis.read(fileBytes, 0, (int) file.length());
+				assert (bytesRead == fileBytes.length);
+				assert (bytesRead == (int) file.length());
+				fos.write(fileBytes);
+				fos.flush();
+				fileBytes = null;
+				fis.close();
+				fis = null;
+			}
 
-        int bytesRead = 0;
+			fos.close();
+			fos = null;
 
-        List<File> list = new ArrayList<File>();
-       
-        for(int i=1; i<=size ; i++)
-        {
-        list.add(new File(Integer.toString(i)));
-        }
-        
-        try {
-
-            fos = new FileOutputStream(ofile,true);
-
-            for (File file : list) {
-
-                fis = new FileInputStream(file);
-
-                fileBytes = new byte[(int) file.length()];
-
-                bytesRead = fis.read(fileBytes, 0,(int)  file.length());
-
-                assert(bytesRead == fileBytes.length);
-
-                assert(bytesRead == (int) file.length());
-
-                fos.write(fileBytes);
-
-                fos.flush();
-
-                fileBytes = null;
-
-                fis.close();
-
-                fis = null;
-
-            }
-
-            fos.close();
-
-            fos = null;
-
-        }catch (Exception exception){
-
-            exception.printStackTrace();
-
-        }
-
-    }
-
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
+	}
 }

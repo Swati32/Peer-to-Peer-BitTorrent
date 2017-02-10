@@ -21,24 +21,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MergeFile {
-	private static String FILE_NAME = "Final.pdf";
+	private String FILE_NAME = "Final.pdf";
 
-	public void merge(int num) {
-		int size = num;
-		File ofile = new File(FILE_NAME);
-		FileOutputStream fos;
-		FileInputStream fis;
+	public void merge(int totalChunks,String path) {
+		File ofile = new File(path+FILE_NAME);
+		System.out.println(ofile);
+		FileOutputStream fos = null;
+		FileInputStream fis = null;
 		byte[] fileBytes;
 		int bytesRead = 0;
 
 		List<File> list = new ArrayList<File>();
 
-		for (int i = 1; i <= size; i++) {
-			list.add(new File(Integer.toString(i)));
+		for (int i = 1; i <= totalChunks; i++) {
+			list.add(new File(path+Integer.toString(i)));
 		}
 
 		try {
-			fos = new FileOutputStream(ofile, true);
+			fos = new FileOutputStream(ofile, false);
 			for (File file : list) {
 				fis = new FileInputStream(file);
 				fileBytes = new byte[(int) file.length()];
@@ -57,6 +57,8 @@ public class MergeFile {
 
 		} catch (Exception exception) {
 			exception.printStackTrace();
-		}
-	}
-}
+		}//end Try-Catch
+		
+	}//end merge
+	
+}//end MergeFile

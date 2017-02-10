@@ -1,23 +1,22 @@
 
-//imports
-import java.net.*;
 import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
 import java.util.*;
 
 
 class FileSplit {
-    //Splits a file into chunks and returns the chunk numbers in Arraylist	
-    public ArrayList splitFile(File f) throws IOException {
+	
+    //Splits a file into chunks and returns the chunk number in List	
+    public ArrayList<Integer> splitFile(File file) throws IOException {
+    	
         int partCounter = 1;
-        int sizeOfFiles = 1024 * 100;// 100KB
+        int sizeOfFiles = 1024 * 100;      // 100KB
         byte[] buffer = new byte[sizeOfFiles];
-        ArrayList ChunkList= new ArrayList<String>(); 
+        ArrayList<Integer> ChunkList= new ArrayList<Integer>(); 
         
-        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(f))) {
-            String name = f.getName();
-            Long size =f.length();
+        
+        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
+            String name = file.getName();
+            Long size =file.length();
             System.out.println("File Name : "+ name) ;
             System.out.println("File Size : "+ size) ;
             int tmp = 0;
@@ -26,6 +25,7 @@ class FileSplit {
                 FileOutputStream out = new FileOutputStream(newFile) ;
                 out.write(buffer, 0, tmp);
                 ChunkList.add(partCounter);
+                out.close();
             }
             System.out.println("Number of Chunks : "+ (partCounter-1)) ;  
         }

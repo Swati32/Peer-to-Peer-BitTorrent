@@ -1,42 +1,39 @@
 
 
-import java.net.*;
 import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
-import java.util.*;
+
 
 public class ReadWriteFile {
+	public static int CONFIG_COL = 4;
+	public static int CONFIG_ROWS = 0;
+	
 	public String[][] read(String filename) throws IOException {
 		String line = null;
-		String[][] ret = null;
+		String[][] ports = null;
+		
 		try {
 			FileReader fileReader = new FileReader(filename);
-			File File = new File(filename);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
-			int lnr = countLines(filename);
-		
-			int i = 0;
-			String[][] abc = new String[lnr][4];
+			line = bufferedReader.readLine();     //Skip header
+			CONFIG_ROWS = countLines(filename); 
+			ports = new String[CONFIG_ROWS-1][CONFIG_COL];
+			int row= 0;
 			while ((line = bufferedReader.readLine()) != null) {
-				if(i>0){
+				
 				String[] elems = line.split("\\s+");
-				for (int j = 0; j < 4; j++) {
-					abc[i-1][j] = elems[j];
+				for (int col = 0; col < CONFIG_COL; col++) {
+					ports[row][col] = elems[col];
 				}
-				}
-				i++;
+				row++;
 			}
 			bufferedReader.close();
-			ret = abc;
 		} catch (FileNotFoundException ex) {
 			System.out.println("Unable to open file '" + filename + "'");
 		} catch (IOException ex) {
 			System.out.println("Error reading file '" + filename + "'");
-			// Or we could just do this:
-			// ex.printStackTrace();
 		}
-		return ret;
+		
+		return ports;
 	}
 
 	public void write(String[][] arr, String filename) {
@@ -47,12 +44,7 @@ public class ReadWriteFile {
 			PrintWriter printWriter = new PrintWriter(fileWriter);
 			printWriter.println("C PN Neigh1 Neigh2  ");
 			for (int i = 0; i < arr.length; i++) {
-				for (int j = 0; j < 4; j++) {
-					if(j!=0)
-					{
-						printWriter.write(" ");
-					}
-					
+				for (int j = 0; j < CONFIG_COL; j++) {
 					printWriter.write(arr[i][j] + " ");
 				}
 				printWriter.println();
@@ -65,13 +57,10 @@ public class ReadWriteFile {
 	}
 	
 	public int countLines(String filename) throws IOException {
-	LineNumberReader reader  = new LineNumberReader(new FileReader(filename));
-	int cnt = 0;
-	String lineRead = "";
-	while ((lineRead = reader.readLine()) != null) {}
-
-	cnt = reader.getLineNumber(); 
-	reader.close();
-	return cnt;
+		LineNumberReader reader  = new LineNumberReader(new FileReader(filename));
+		while ((reader.readLine()) != null) {}
+		int cnt = reader.getLineNumber(); 
+		reader.close();
+		return cnt;
 	}
 }
